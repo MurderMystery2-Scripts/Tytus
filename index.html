@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>In Memory of Tytus Jones</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      touch-action: manipulation;
+    }
+    h1 {
+      font-size: 3.2rem;
+      margin: 0.4em 0;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+    .dates {
+      font-size: 1.4rem;
+      color: #888;
+      margin: 0.6em 0 1.8em;
+    }
+    .section {
+      cursor: pointer;
+      transition: transform 0.2s, filter 0.3s;
+      margin: 1.5em 0 0.5em;
+    }
+    .section:hover {
+      transform: scale(1.03);
+      filter: brightness(1.1);
+    }
+    .portrait {
+      max-width: 280px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(200, 50, 50, 0.2);
+      border: 2px solid #333;
+    }
+    .footer-note {
+      font-size: 1.1rem;
+      color: #ff5555;
+      margin: 0.6em 0 2em;
+      font-style: italic;
+      max-width: 90%;
+    }
+    .timer {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #ff5555;
+      background: rgba(40, 20, 20, 0.6);
+      padding: 1.2em 1.8em;
+      border-radius: 12px;
+      border: 1px solid #333;
+      box-shadow: 0 0 25px rgba(200, 50, 50, 0.15);
+      min-width: 320px;
+    }
+    .timer span {
+      display: inline-block;
+      min-width: 80px;
+    }
+    .label {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-top: 0.4em;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .message {
+      max-width: 620px;
+      font-size: 1.3rem;
+      line-height: 1.6;
+      margin: 2.5em 1em 1em;
+      color: #ccc;
+    }
+    .note {
+      font-style: italic;
+      color: #ff5555;
+      margin-top: 0.8em;
+    }
+    footer {
+      position: absolute;
+      bottom: 1.5em;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    #audio-container {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      z-index: 10;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>In Memory of Tytus Jones</h1>
+  <div class="dates">16 December 2009 – 28 February 2026</div>
+
+  <div class="section" onclick="unlockAudio()">
+    <img src="YOUR_TYTUS_IMAGE_URL_HERE.jpg" alt="Tytus Jones - last seen spamming" class="portrait">
+    <div class="footer-note">Click Tytus image to pay respect</div>
+  </div>
+
+  <div class="timer" id="timer">
+    <span id="days">0</span>d
+    <span id="hours">00</span>h
+    <span id="minutes">00</span>m
+    <span id="seconds">00</span>s
+    <div class="label">since we last heard from him</div>
+  </div>
+
+  <div class="message">
+    Tytus was that guy who never shut up in text.<br>
+    Always annoying, always in voice dropping garbage,<br>
+    gay as hell and proud of it, but nobody could stand the constant spam.<br>
+    Server felt quieter the second he went dark.<br>
+    <span class="note">Last message: 28 February 2026, 3:14 AM UTC. Good riddance.</span>
+  </div>
+
+  <!-- YouTube iframe - kept for now, change src or remove if you want silence -->
+  <div id="audio-container">
+    <iframe id="player" 
+      src="https://www.youtube.com/embed/mzB1VGEGcSU?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=mzB1VGEGcSU&playsinline=1&controls=0" 
+      frameborder="0" 
+      allow="autoplay; encrypted-media; playsinline" 
+      allowfullscreen></iframe>
+  </div>
+
+  <script>
+    // Timer script - last contact time
+    const lossDate = new Date('2026-02-28T03:14:00Z');
+
+    function updateTimer() {
+      const now = new Date();
+      let diff = now - lossDate;
+
+      if (diff < 0) {
+        document.getElementById('days').textContent = '0';
+        document.getElementById('hours').textContent = '00';
+        document.getElementById('minutes').textContent = '00';
+        document.getElementById('seconds').textContent = '00';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      diff -= days * (1000 * 60 * 60 * 24);
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      diff -= hours * (1000 * 60 * 60);
+
+      const minutes = Math.floor(diff / (1000 * 60));
+      diff -= minutes * (1000 * 60);
+
+      const seconds = Math.floor(diff / 1000);
+
+      document.getElementById('days').textContent = days;
+      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+      document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
+
+    // YouTube player API stuff
+    let player;
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        events: {
+          'onReady': onPlayerReady
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      setTimeout(() => {
+        if (player && player.unMute) {
+          player.unMute();
+          player.setVolume(40);
+        }
+      }, 2500);
+    }
+
+    function unlockAudio() {
+      if (player && player.unMute) {
+        player.unMute();
+        player.setVolume(50);
+      }
+    }
+
+    // Fallback unlock triggers
+    document.addEventListener('touchstart', unlockAudio, {once: true, passive: true});
+    document.addEventListener('mousemove', unlockAudio, {once: true});
+    document.addEventListener('keydown', unlockAudio, {once: true});
+    document.addEventListener('scroll', unlockAudio, {once: true});
+
+    // Load YT API
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  </script>
+
+</body>
+</html>
